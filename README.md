@@ -2,7 +2,7 @@
 
 **AmortizationApp** is a locally hosted web browser application that determines the monthly payments on a fixed loan as well as  an amortization schedule for a given payment period.  The application accepts extra payments for investigating various payback scenarios.  Also if Microsoft Office is installed, the application can optionally create an Excel spreadsheet showing the complete schedule.  **AmortizationApp** was inspired by the online loan calculator at [Bankrate](https://www.bankrate.com/calculators/mortgages/loan-calculator.aspx).
 
-The application is Windows based and assumes that Microsoft .NET Framework 4.7.1 is installed. Download and extract the `AmortizationApp-master` zip file from the [Amortization repository](https://github.com/deandevl/Amortization.git) . Under the `Installation` directory locate and run the `setup.exe` install file.  
+The application is Windows based and assumes that Microsoft .NET Framework 4.8 is installed. Download and extract the `AmortizationApp-master` zip file from the [Amortization repository](https://github.com/deandevl/Amortization.git) . Under the `Installation` directory locate and run the `setup.exe` install file.  
 
 A desktop and start menu short cuts are provided to start the local html server (i.e. the `AmortizationApp.exe` executable).  From either a Chrome or Firefox browser enter `localhost:8088` in the url address box .  The **AmortizationApp**'s main page will then be rendered.
 
@@ -36,7 +36,7 @@ Click the `Extra Payments` arrow and enter `100` for the `Extra Payment(s)` to y
 
 ​	`Total Interest Paid` ---   269.47 with 28 months of payments
 
-
+A `setup.exe` file  is provided for installing/uninstalling **AmortizationApp**.
 
 
 
