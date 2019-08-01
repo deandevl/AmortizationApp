@@ -6,16 +6,19 @@ using BasicWebServerLib;
 using BasicWebServerLib.Events;
 using BasicWebServerLib.HttpCommon;
 using Excel = Microsoft.Office.Interop.Excel;
+using System.Web.Script.Serialization;
 
 namespace AmortizationApp {
   public class Handlers {
     private readonly string _serverBaseFolder;
     private readonly Helpers _helpers;
     private readonly Dictionary<string, Action> _actions;
+    private readonly JavaScriptSerializer _serializer;
     private Dictionary<string, object> _requestDictionary;
     private HttpConnectionDetails _httpDetails;
     
     public Handlers(string serverBaseFolder) {
+      _serializer = new JavaScriptSerializer();
       _serverBaseFolder = serverBaseFolder;
       _helpers = new Helpers();
       
@@ -28,20 +31,20 @@ namespace AmortizationApp {
             string onetimeExtraPaymentDate = null;
             int? onetimeExtraPayment = null;
             
-            int startMonthIdx = Convert.ToInt32(_requestDictionary["start_month_idx"]);
-            int startYear = Convert.ToInt32(_requestDictionary["start_year"]);
-            int amount = Convert.ToInt32(_requestDictionary["amount"]);
-            decimal yearlyInterest = Convert.ToDecimal(_requestDictionary["yearly_interest"]);
-            int loanTerm = Convert.ToInt32(_requestDictionary["loan_term"]);
+            int startMonthIdx = (int)(_requestDictionary["start_month_idx"]);
+            int startYear = (int)(_requestDictionary["start_year"]);
+            int amount = (int)(_requestDictionary["amount"]);
+            decimal yearlyInterest = (decimal)(_requestDictionary["yearly_interest"]);
+            int loanTerm = (int)(_requestDictionary["loan_term"]);
 
             if(_requestDictionary["monthly_extra_payment"] != null) {
-              monthlyExtraPayment = Convert.ToInt32(_requestDictionary["monthly_extra_payment"]);
+              monthlyExtraPayment = (int)(_requestDictionary["monthly_extra_payment"]);
             }
             if(_requestDictionary["onetime_extra_payment_date"] != null) {
               onetimeExtraPaymentDate = (string)_requestDictionary["onetime_extra_payment_date"];
             }
             if(_requestDictionary["onetime_extra_payment"] != null) {
-              onetimeExtraPayment = Convert.ToInt32(_requestDictionary["onetime_extra_payment"]);
+              onetimeExtraPayment = (int)(_requestDictionary["onetime_extra_payment"]);
             }
          
 
@@ -118,7 +121,7 @@ namespace AmortizationApp {
               {"extrapay_list",extrapayList},
               {"balance_list",balanceList}
             };
-            string responseStr = _helpers.DictionaryToJson(responseDict);
+            string responseStr = _serializer.Serialize(responseDict);
             _helpers.SendHttpTextResponse(_httpDetails.Response, responseStr);
 
           } catch(Exception ex) {
@@ -127,17 +130,17 @@ namespace AmortizationApp {
         }},
         {"createExcel", () => {
           try {
-            int amount = Convert.ToInt32(_requestDictionary["amount"]);
-            decimal yearlyInterest = Convert.ToDecimal(_requestDictionary["yearly_interest"]);
-            int loanTerm = Convert.ToInt32(_requestDictionary["loan_term"]);
+            int amount = (int)(_requestDictionary["amount"]);
+            decimal yearlyInterest = (decimal)(_requestDictionary["yearly_interest"]);
+            int loanTerm = (int)(_requestDictionary["loan_term"]);
             
-            ArrayList dateList = _helpers.JArrayToArrayList(_requestDictionary["date_list"]);
-            ArrayList bankpayList = _helpers.JArrayToArrayList(_requestDictionary["bankpay_list"]);
-            ArrayList principalList = _helpers.JArrayToArrayList(_requestDictionary["principal_list"]);
-            ArrayList interestList = _helpers.JArrayToArrayList(_requestDictionary["interest_list"]);
-            ArrayList totalInterestList = _helpers.JArrayToArrayList(_requestDictionary["total_interest_list"]);
-            ArrayList extrapayList = _helpers.JArrayToArrayList(_requestDictionary["extrapay_list"]);
-            ArrayList balanceList = _helpers.JArrayToArrayList(_requestDictionary["balance_list"]);
+            ArrayList dateList = (ArrayList)_requestDictionary["date_list"];
+            ArrayList bankpayList = (ArrayList)_requestDictionary["bankpay_list"];
+            ArrayList principalList = (ArrayList)_requestDictionary["principal_list"];
+            ArrayList interestList = (ArrayList)_requestDictionary["interest_list"];
+            ArrayList totalInterestList = (ArrayList)_requestDictionary["total_interest_list"];
+            ArrayList extrapayList = (ArrayList)_requestDictionary["extrapay_list"];
+            ArrayList balanceList = (ArrayList)_requestDictionary["balance_list"];
               
             //Create Excel App
             Excel.Application excelApp = new Excel.Application();
@@ -231,7 +234,7 @@ namespace AmortizationApp {
       HttpRequestEventArgs httpArgs = (HttpRequestEventArgs)args;
       _httpDetails = httpArgs.Details;
       string body = (string)httpArgs.Body;
-      _requestDictionary = _helpers.JsonToDictionary(body);
+      _requestDictionary = _serializer.Deserialize<Dictionary<string, object>>(body);
       
       if(_httpDetails.HttpPath == "loan") {
         _actions[(string)_requestDictionary["action"]]();
